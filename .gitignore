@@ -1,0 +1,26 @@
+# Node.js (Next.js)
+node_modules/
+.next/
+out/
+*.log
+.npm/
+.yarn/
+dist/
+.env*
+.vercel/
+.idea/
+
+# Go
+bin/
+*.exe
+*.test
+*.out
+vendor/
+*.sum
+*.mod
+.env
+
+# OS & Editor
+.DS_Store
+Thumbs.db
+.vscode/
