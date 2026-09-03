@@ -1,2 +1,12 @@
 server
 *.log
+.git
+.gitignore
+Dockerfile
+.dockerignore
+.env
+.env.*
+tmp
+bin
+*.log
+README.md
