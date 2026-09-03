@@ -5,6 +5,7 @@
 - `frontend/` — Next.js + TypeScript app
 - `backend/` — Go HTTP API (`cmd/server`)
 - `docker-compose.yml`
+- `docs/schema.md` — database schema design notes
 
 ## Development
 
