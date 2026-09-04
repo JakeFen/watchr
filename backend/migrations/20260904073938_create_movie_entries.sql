@@ -10,9 +10,25 @@ CREATE TABLE
         poster_path TEXT,
         status movie_entries_status NOT NULL,
         rating SMALLINT,
+        review TEXT,
         created_at TIMESTAMPTZ NOT NULL DEFAULT NOW (),
         updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW (),
-        UNIQUE (user_id, tmdb_movie_id)
+        UNIQUE (user_id, tmdb_movie_id),
+        CHECK (
+            (
+                status = 'watched'
+                AND rating IS NOT NULL
+            )
+            OR (
+                status <> 'watched'
+                AND rating IS NULL
+                AND review IS NULL
+            )
+        ),
+        CHECK (
+            rating IS NULL
+            OR rating BETWEEN 1 AND 5
+        )
     );
 
 -- +goose Down
