@@ -43,7 +43,6 @@ Tracks a user's relationship to a movie: want to watch, watching, watched — an
 | poster_path   | text        | snapshot from TMDB, nullable            |
 | status        | text/enum   | want_to_watch / watching / watched      |
 | rating        | smallint    | nullable                                |
-| watched_at    | timestamptz | nullable                                |
 | created_at    | timestamptz |                                          |
 | updated_at    | timestamptz |                                          |
 
