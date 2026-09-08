@@ -83,11 +83,6 @@ func (h *Handler) CreateMovieEntry(w http.ResponseWriter, r *http.Request) {
 // user can look up any entry by id -- entries are posts other users
 // will eventually like and comment on, not private to their owner.
 func (h *Handler) GetMovieEntry(w http.ResponseWriter, r *http.Request) {
-	if _, ok := auth.ClerkUserID(r.Context()); !ok {
-		writeError(w, http.StatusUnauthorized, "missing or invalid session")
-		return
-	}
-
 	id := r.PathValue("id")
 	entry, err := database.GetMovieEntryByID(r.Context(), h.DB, id)
 	if errors.Is(err, pgx.ErrNoRows) {

@@ -56,7 +56,7 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/health", healthHandler)
 	mux.Handle("POST /movie-entries", auth.RequireAuth(http.HandlerFunc(h.CreateMovieEntry)))
-	mux.Handle("GET /movie-entries/{id}", auth.RequireAuth(http.HandlerFunc(h.GetMovieEntry)))
+	mux.HandleFunc("GET /movie-entries/{id}", h.GetMovieEntry)
 	mux.Handle("DELETE /movie-entries/{id}", auth.RequireAuth(http.HandlerFunc(h.DeleteMovieEntry)))
 
 	log.Printf("server listening on :%s", port)
