@@ -18,10 +18,13 @@ services:
       context: ./backend
     image: watchr-backend:0.1.0
     container_name: watchr-backend
+    env_file:
+      - ./backend/.env.local
     ports:
       - "8080:8080"
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
 
   postgres:
     image: postgres:17
@@ -34,6 +37,11 @@ services:
       - "5432:5432"
     volumes:
       - watchr-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U watchr -d watchr"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
   watchr-postgres-data:

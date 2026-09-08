@@ -8,7 +8,7 @@ import (
 
 // GetOrCreateUser looks up a user by their Clerk id, creating a row on
 // first sight, and returns the local users.id.
-func GetOrCreateUser(ctx context.Context, db *pgx.Conn, clerkUserID string) (string, error) {
+func GetOrCreateUser(ctx context.Context, db DB, clerkUserID string) (string, error) {
 	var userID string
 
 	queryErr := db.QueryRow(ctx,
