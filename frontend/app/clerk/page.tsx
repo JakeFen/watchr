@@ -1,4 +1,4 @@
-import { Show, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
+import { Show, UserButton } from "@clerk/nextjs";
 import { SessionTokenCard } from "../components/SessionTokenCard";
 
 export default function ClerkPage() {
@@ -7,21 +7,6 @@ export default function ClerkPage() {
       <h1 className="text-2xl font-semibold text-black dark:text-zinc-50">
         Watchr
       </h1>
-
-      <Show when="signed-out">
-        <div className="flex gap-4">
-          <SignInButton>
-            <button className="rounded-full bg-foreground px-5 py-2 text-sm font-medium text-background hover:bg-[#383838] dark:hover:bg-[#ccc]">
-              Sign in
-            </button>
-          </SignInButton>
-          <SignUpButton>
-            <button className="rounded-full border border-black/[.08] px-5 py-2 text-sm font-medium hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a]">
-              Sign up
-            </button>
-          </SignUpButton>
-        </div>
-      </Show>
 
       <Show when="signed-in">
         <div className="flex flex-col items-center gap-6">
