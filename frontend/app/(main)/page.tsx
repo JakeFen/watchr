@@ -1,9 +1,13 @@
+import { NavBar } from "../components/NavBar";
+import { LandingContent } from "../features/landing/LandingContent";
+
 export default function LandingPage() {
   return (
-    <div className="flex flex-1 flex-col items-center justify-center gap-6 bg-zinc-50 p-8 font-sans dark:bg-black">
-      <h1 className="text-2xl font-semibold text-black dark:text-zinc-50">
-        Landing page
-      </h1>
+    <div className="flex min-h-full flex-1 flex-col bg-zinc-900">
+      <NavBar />
+      <main className="mx-auto w-full max-w-7xl flex-1 px-4 sm:px-6 lg:px-8">
+        <LandingContent />
+      </main>
     </div>
   );
 }
