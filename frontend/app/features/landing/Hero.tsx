@@ -1,4 +1,6 @@
+import { SignUpButton } from "@clerk/nextjs";
 import Image from "next/image";
+import { Button } from "../../components/Button";
 
 export function Hero() {
   return (
@@ -20,13 +22,13 @@ export function Hero() {
         <h1 className="max-w-2xl text-4xl font-semibold tracking-tight text-zinc-100 sm:text-5xl">
           Track what you watch.
         </h1>
-        <p className="mt-4 max-w-xl text-base text-zinc-300 sm:text-lg">
+        <p className="mt-4 mb-8 max-w-xl text-base text-zinc-300 sm:text-lg">
           Discover trending movies and shows, and keep a log of everything
           you&apos;ve seen.
         </p>
-        <button className="mt-8 cursor-pointer rounded-full bg-zinc-100 px-6 py-3 text-base font-semibold text-black transition-colors hover:bg-zinc-300">
-          Get Started Now
-        </button>
+        <SignUpButton mode="modal">
+          <Button>Get Started Now</Button>
+        </SignUpButton>
       </div>
     </section>
   );

@@ -1,5 +1,7 @@
 import { Show, SignInButton, SignOutButton, SignUpButton } from "@clerk/nextjs";
 import Link from "next/link";
+import { Button } from "./Button";
+import { ButtonVariant } from "../types/button";
 
 export function NavBar() {
   return (
@@ -19,22 +21,16 @@ export function NavBar() {
 
           <Show when="signed-out">
             <SignInButton mode="modal">
-              <button className="cursor-pointer text-base font-semibold text-zinc-300 transition-colors hover:text-white">
-                Login
-              </button>
+              <Button variant={ButtonVariant.Nav}>Login</Button>
             </SignInButton>
             <SignUpButton mode="modal">
-              <button className="cursor-pointer text-base font-semibold text-zinc-300 transition-colors hover:text-white">
-                Sign up
-              </button>
+              <Button variant={ButtonVariant.Nav}>Sign up</Button>
             </SignUpButton>
           </Show>
 
           <Show when="signed-in">
             <SignOutButton>
-              <button className="cursor-pointer text-base font-semibold text-zinc-300 transition-colors hover:text-white">
-                Sign out
-              </button>
+              <Button variant={ButtonVariant.Nav}>Sign out</Button>
             </SignOutButton>
           </Show>
         </div>
