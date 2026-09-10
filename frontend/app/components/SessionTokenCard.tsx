@@ -1,3 +1,5 @@
+// Marks this a Client Component so it runs in the browser, not just the server.
+// Needed because it uses useState and an onClick handler, which only work client-side.
 "use client";
 
 import { useAuth } from "@clerk/nextjs";
