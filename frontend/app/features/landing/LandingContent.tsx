@@ -1,9 +1,14 @@
 import { Show } from "@clerk/nextjs";
 import { TrendingRow } from "../../components/TrendingRow";
-import { trendingMovies, trendingShows } from "./data";
+import { getTrendingMovies, getTrendingShows } from "./data";
 import { Hero } from "./Hero";
 
-export function LandingContent() {
+export async function LandingContent() {
+  const [trendingMovies, trendingShows] = await Promise.all([
+    getTrendingMovies(),
+    getTrendingShows(),
+  ]);
+
   return (
     <>
       <Show when="signed-out">
