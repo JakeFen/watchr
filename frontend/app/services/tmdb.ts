@@ -1,5 +1,5 @@
-import type { MediaItem } from "../../components/MediaCard";
-import type { TmdbMediaType, TmdbTrendingResult } from "../../types/tmdb";
+import type { MediaItem } from "../components/MediaCard";
+import type { TmdbMediaType, TmdbTrendingResult } from "../types/tmdb";
 
 const TMDB_API_BASE_URL = "https://api.themoviedb.org/3";
 const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w342";

@@ -1,6 +1,6 @@
 import { Show } from "@clerk/nextjs";
 import { TrendingRow } from "../../components/TrendingRow";
-import { getTrendingMovies, getTrendingShows } from "./data";
+import { getTrendingMovies, getTrendingShows } from "../../services/tmdb";
 import { Hero } from "./Hero";
 
 export async function LandingContent() {
