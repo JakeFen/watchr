@@ -13,7 +13,7 @@ export function NavBar() {
 
         <div className="flex items-center gap-6">
           <Link
-            href="/"
+            href="/discover"
             className="text-base font-semibold text-zinc-300 transition-colors hover:text-white"
           >
             Discover

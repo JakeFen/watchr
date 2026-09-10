@@ -1,10 +1,5 @@
 import Image from "next/image";
-
-export type MediaItem = {
-  id: string;
-  title: string;
-  imageUrl?: string;
-};
+import type { MediaItem } from "../types/media";
 
 export function MediaCard({ item }: { item: MediaItem }) {
   return (
@@ -18,6 +13,12 @@ export function MediaCard({ item }: { item: MediaItem }) {
             sizes="(min-width: 640px) 11rem, 9rem"
             className="object-cover"
           />
+        )}
+        {/* Rating */}
+        {item.rating !== undefined && (
+          <div className="absolute top-2 right-2 rounded-full bg-black/70 px-3 py-1 text-base font-semibold text-zinc-100">
+            ★ {item.rating.toFixed(1)}
+          </div>
         )}
       </div>
       <p className="truncate text-sm font-medium text-zinc-200">{item.title}</p>

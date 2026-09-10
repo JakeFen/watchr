@@ -1,14 +1,19 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { MediaCard, type MediaItem } from "./MediaCard";
+import { Chip } from "./Chip";
+import { MediaCard } from "./MediaCard";
+import type { ChipProps } from "../types/chip";
+import type { MediaItem } from "../types/media";
 
-export function MediaRow({
+export function MediaRow<T extends string = string>({
   title,
   items,
+  chips,
 }: {
   title: string;
   items: MediaItem[];
+  chips?: ChipProps<T>;
 }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [showLeftFade, setShowLeftFade] = useState(false);
@@ -29,7 +34,12 @@ export function MediaRow({
 
   return (
     <section className="py-8">
-      <h2 className="mb-4 text-xl font-semibold text-zinc-100">{title}</h2>
+      <div className="mb-4 flex items-center gap-4">
+        <h2 className="text-xl font-semibold text-zinc-100">{title}</h2>
+        {chips && (
+          <Chip options={chips.options} value={chips.value} onChange={chips.onChange} />
+        )}
+      </div>
       <div className="relative">
         {/* Fades the left edge in once you've scrolled away from the start */}
         <div
