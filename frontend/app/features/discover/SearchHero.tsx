@@ -1,6 +1,6 @@
 export function SearchHero() {
   return (
-    <section className="relative left-1/2 w-screen -translate-x-1/2 bg-gradient-to-b from-blue-900/70 via-blue-950/30 to-zinc-800 py-16">
+    <section className="relative left-1/2 w-screen -translate-x-1/2 bg-gradient-to-b from-blue-900/70 from-0% via-black via-90% to-zinc-900 py-20">
       <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         <h1 className="text-3xl font-bold text-zinc-100 sm:text-4xl">
           Search for films, shows, and <span className="text-blue-400">friends</span>
