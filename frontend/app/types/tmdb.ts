@@ -1,4 +1,7 @@
-export type TmdbMediaType = "movie" | "tv";
+export enum TmdbMediaType {
+  Movie = "movie",
+  Tv = "tv",
+}
 
 export type TmdbTrendingResult = {
   id: number;

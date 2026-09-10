@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { MediaCard, type MediaItem } from "./MediaCard";
 
-export function TrendingRow({
+export function MediaRow({
   title,
   items,
 }: {
@@ -47,7 +47,7 @@ export function TrendingRow({
         <div
           ref={scrollRef}
           onScroll={updateFades}
-          className="flex gap-4 overflow-x-auto pb-2"
+          className="flex gap-4 overflow-x-auto pb-4 [scrollbar-color:var(--color-zinc-600)_transparent] [scrollbar-width:thin] [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-zinc-600 [&::-webkit-scrollbar-track]:bg-transparent"
         >
           {items.map((item) => (
             <MediaCard key={item.id} item={item} />

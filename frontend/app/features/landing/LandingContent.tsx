@@ -1,5 +1,5 @@
 import { Show } from "@clerk/nextjs";
-import { TrendingRow } from "../../components/TrendingRow";
+import { MediaRow } from "../../components/MediaRow";
 import { getTrendingMovies, getTrendingShows } from "../../services/tmdb";
 import { Hero } from "./Hero";
 
@@ -13,8 +13,8 @@ export async function LandingContent() {
     <>
       <Show when="signed-out">
         <Hero />
-        <TrendingRow title="Trending Movies" items={trendingMovies} />
-        <TrendingRow title="Trending Shows" items={trendingShows} />
+        <MediaRow title="Trending Movies" items={trendingMovies} />
+        <MediaRow title="Trending Shows" items={trendingShows} />
       </Show>
       <Show when="signed-in">
         <p>Signed In</p>
