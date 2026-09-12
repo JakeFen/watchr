@@ -1,11 +1,13 @@
+import { auth } from "@clerk/nextjs/server";
 import { notFound } from "next/navigation";
 import { MediaRow } from "../../../components/MediaRow";
+import { getMyMediaEntry } from "../../../services/mediaEntries";
 import { getMediaDetails } from "../../../services/tmdb";
 import { TmdbMediaType } from "../../../types/tmdb";
 import { MediaBackdrop } from "./MediaBackdrop";
 import { MediaCastRow } from "./MediaCastRow";
 import { MediaDetailsFacts } from "./MediaDetailsFacts";
-import { MediaHeader } from "./MediaHeader";
+import { MediaHeader, type MediaActionsProps } from "./MediaHeader";
 import { MediaOverview } from "./MediaOverview";
 
 export async function MediaDetailsContent({ id, type }: { id: string; type?: string }) {
@@ -16,13 +18,21 @@ export async function MediaDetailsContent({ id, type }: { id: string; type?: str
     notFound();
   }
 
+  const { userId, getToken } = await auth();
+  const tmdbId = Number(details.id);
+  const token = userId ? await getToken() : null;
+  const initialEntry = token
+    ? await getMyMediaEntry(token, mediaType, tmdbId).catch(() => null)
+    : null;
+  const mediaActions: MediaActionsProps = { initialEntry, isSignedIn: !!userId };
+
   return (
     <div className="pb-16">
       <MediaBackdrop backdropUrl={details.backdropUrl} />
 
       <div className="relative -mt-56 grid gap-10 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          <MediaHeader details={details} />
+          <MediaHeader details={details} mediaActions={mediaActions} />
           <MediaOverview details={details} />
         </div>
 

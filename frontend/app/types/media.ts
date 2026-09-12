@@ -32,6 +32,7 @@ export type MediaDetails = {
   title: string;
   tagline?: string;
   overview: string;
+  posterPath?: string;
   posterUrl?: string;
   backdropUrl?: string;
   releaseDate?: string;

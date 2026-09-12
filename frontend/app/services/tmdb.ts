@@ -115,6 +115,7 @@ export async function getMediaDetails(
     title: details.title ?? details.name ?? "Untitled",
     tagline: details.tagline || undefined,
     overview: details.overview,
+    posterPath: details.poster_path ?? undefined,
     posterUrl: details.poster_path
       ? tmdbImageUrl(TmdbImageWidth.Poster, details.poster_path)
       : undefined,

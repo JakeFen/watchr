@@ -4,9 +4,21 @@ import { Button } from "../../../components/Button";
 import { MediaActions } from "../../../components/MediaActions";
 import { PillList } from "../../../components/PillList";
 import type { MediaDetails } from "../../../types/media";
+import type { MediaEntry } from "../../../types/mediaEntry";
 import { formatDate } from "./mediaFormat";
 
-export function MediaHeader({ details }: { details: MediaDetails }) {
+export type MediaActionsProps = {
+  initialEntry: MediaEntry | null;
+  isSignedIn: boolean;
+};
+
+export function MediaHeader({
+  details,
+  mediaActions,
+}: {
+  details: MediaDetails;
+  mediaActions: MediaActionsProps;
+}) {
   return (
     <div className="flex flex-col gap-6 sm:flex-row sm:items-end">
       {/* Poster */}
@@ -58,7 +70,14 @@ export function MediaHeader({ details }: { details: MediaDetails }) {
               ▶ Watch Trailer
             </Button>
           )}
-          <MediaActions />
+          <MediaActions
+            mediaType={details.mediaType}
+            tmdbId={Number(details.id)}
+            title={details.title}
+            posterPath={details.posterPath}
+            initialEntry={mediaActions.initialEntry}
+            isSignedIn={mediaActions.isSignedIn}
+          />
         </div>
       </div>
     </div>

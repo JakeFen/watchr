@@ -55,9 +55,11 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/health", healthHandler)
-	mux.Handle("POST /movie-entries", auth.RequireAuth(http.HandlerFunc(h.CreateMovieEntry)))
-	mux.HandleFunc("GET /movie-entries/{id}", h.GetMovieEntry)
-	mux.Handle("DELETE /movie-entries/{id}", auth.RequireAuth(http.HandlerFunc(h.DeleteMovieEntry)))
+	mux.Handle("POST /media-entries", auth.RequireAuth(http.HandlerFunc(h.CreateMediaEntry)))
+	mux.Handle("GET /media-entries/tmdb/{mediaType}/{tmdbID}", auth.RequireAuth(http.HandlerFunc(h.GetMyMediaEntryByTMDBID)))
+	mux.HandleFunc("GET /media-entries/{id}", h.GetMediaEntry)
+	mux.Handle("PATCH /media-entries/{id}", auth.RequireAuth(http.HandlerFunc(h.UpdateMediaEntry)))
+	mux.Handle("DELETE /media-entries/{id}", auth.RequireAuth(http.HandlerFunc(h.DeleteMediaEntry)))
 
 	log.Printf("server listening on :%s", port)
 	if err := http.ListenAndServe(":"+port, mux); err != nil {
