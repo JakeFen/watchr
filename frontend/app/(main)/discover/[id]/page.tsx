@@ -1,5 +1,14 @@
-export default async function MediaDetailsPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+import { MediaDetailsContent } from "../../../features/discover/media-details/MediaDetailsContent";
 
-  return <p className="py-8 text-zinc-200">Media {id}</p>;
+export default async function MediaDetailsPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ type?: string }>;
+}) {
+  const { id } = await params;
+  const { type } = await searchParams;
+
+  return <MediaDetailsContent id={id} type={type} />;
 }

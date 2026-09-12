@@ -4,7 +4,10 @@ import type { MediaItem } from "../types/media";
 
 export function MediaCard({ item }: { item: MediaItem }) {
   return (
-    <Link href={`/discover/${item.id}`} className="group flex w-36 shrink-0 flex-col gap-2 sm:w-44">
+    <Link
+      href={`/discover/${item.id}?type=${item.mediaType}`}
+      className="group flex w-36 shrink-0 flex-col gap-2 sm:w-44"
+    >
       <div className="relative aspect-[2/3] w-full overflow-hidden rounded-lg bg-gradient-to-br from-zinc-700 to-zinc-900 after:pointer-events-none after:absolute after:inset-0 after:rounded-lg after:inset-ring-1 after:inset-ring-transparent after:transition-all after:content-[''] hover:after:inset-ring-2 hover:after:inset-ring-blue-400">
         {item.imageUrl && (
           <Image
