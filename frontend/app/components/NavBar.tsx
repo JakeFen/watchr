@@ -1,6 +1,7 @@
-import { Show, SignInButton, SignOutButton, SignUpButton } from "@clerk/nextjs";
+import { Show, SignInButton, SignUpButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { Button } from "./Button";
+import { UserMenu } from "./UserMenu";
 import { ButtonVariant } from "../types/button";
 
 export function NavBar() {
@@ -29,9 +30,7 @@ export function NavBar() {
           </Show>
 
           <Show when="signed-in">
-            <SignOutButton>
-              <Button variant={ButtonVariant.Nav}>Sign out</Button>
-            </SignOutButton>
+            <UserMenu />
           </Show>
         </div>
       </div>
