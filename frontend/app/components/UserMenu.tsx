@@ -26,7 +26,7 @@ export function UserMenu() {
           <div className="fixed inset-0 z-10" onClick={() => setIsOpen(false)} />
           <div className="absolute top-full right-0 z-20 mt-2 w-40 overflow-hidden rounded-lg border border-zinc-700 bg-zinc-800 shadow-xl">
             <Link
-              href="/profile"
+              href={`/users/${user!.id}`}
               onClick={() => setIsOpen(false)}
               className="block px-4 py-2.5 text-left text-sm text-zinc-200 hover:bg-zinc-700"
             >

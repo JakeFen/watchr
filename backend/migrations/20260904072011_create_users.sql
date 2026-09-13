@@ -1,8 +1,7 @@
 -- +goose Up
 CREATE TABLE
     users (
-        id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
-        clerk_user_id TEXT NOT NULL UNIQUE,
+        id TEXT PRIMARY KEY,
         username TEXT UNIQUE,
         avatar_url TEXT,
         bio TEXT,

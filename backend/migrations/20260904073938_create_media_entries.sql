@@ -6,7 +6,7 @@ CREATE TYPE media_entries_media_type AS ENUM ('movie', 'tv');
 CREATE TABLE
     media_entries (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
-        user_id UUID NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+        user_id TEXT NOT NULL REFERENCES users (id) ON DELETE CASCADE,
         media_type media_entries_media_type NOT NULL,
         tmdb_id INTEGER NOT NULL,
         title TEXT NOT NULL,

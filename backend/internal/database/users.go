@@ -1,35 +1,19 @@
 package database
 
-import (
-	"context"
+import "context"
 
-	"github.com/jackc/pgx/v5"
-)
-
-// GetOrCreateUser looks up a user by their Clerk id, creating a row on
-// first sight, and returns the local users.id.
+// GetOrCreateUser ensures a users row exists for this Clerk user id,
+// creating one on first sight, and returns it unchanged. users.id IS
+// the Clerk id now, so there's nothing to look up -- this just
+// guarantees a row exists before anything else (like media_entries)
+// references it by foreign key.
 func GetOrCreateUser(ctx context.Context, db DB, clerkUserID string) (string, error) {
-	var userID string
-
-	queryErr := db.QueryRow(ctx,
-		`SELECT id FROM users WHERE clerk_user_id = $1`, clerkUserID).Scan(&userID)
-
-	if queryErr == nil {
-		return userID, nil
-	}
-
-	if queryErr != pgx.ErrNoRows {
-		return "", queryErr
-	}
-
-	insertErr := db.QueryRow(ctx,
-		`INSERT INTO users (clerk_user_id) VALUES ($1) RETURNING id`,
+	_, err := db.Exec(ctx,
+		`INSERT INTO users (id) VALUES ($1) ON CONFLICT (id) DO NOTHING`,
 		clerkUserID,
-	).Scan(&userID)
-
-	if insertErr != nil {
-		return "", insertErr
+	)
+	if err != nil {
+		return "", err
 	}
-
-	return userID, nil
+	return clerkUserID, nil
 }

@@ -1,13 +1,8 @@
-import { auth } from "@clerk/nextjs/server";
 import { listMediaEntriesForUser } from "../../services/mediaEntries";
-import { getMyUserId } from "../../services/users";
 import { WatchStatus } from "../../types/media";
 
-export async function ProfileStats() {
-  const { getToken } = await auth();
-  const token = await getToken();
-  const myUserId = token ? await getMyUserId(token).catch(() => null) : null;
-  const entries = myUserId ? await listMediaEntriesForUser(myUserId).catch(() => []) : [];
+export async function ProfileStats({ userId }: { userId: string }) {
+  const entries = await listMediaEntriesForUser(userId).catch(() => []);
 
   const stats = [
     { label: "Watched", count: entries.filter((e) => e.status === WatchStatus.Watched).length },
