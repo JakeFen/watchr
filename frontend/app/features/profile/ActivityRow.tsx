@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { WatchStatus } from "../../types/media";
 import type { MediaEntry } from "../../types/mediaEntry";
+import { ActivityDate } from "./ActivityDate";
 import { mediaEntryToMediaItem } from "./mediaEntryToMediaItem";
 
 // TODO: Check ratingStars when rating model is implemented. Rearrange this component to also allow updating media status
@@ -14,16 +15,6 @@ const ACTION_VERB: Record<WatchStatus, string> = {
 
 function ratingStars(rating: number): string {
   return "★".repeat(rating) + "☆".repeat(5 - rating);
-}
-
-function formatActivityDate(dateString: string): string {
-  return new Date(dateString).toLocaleString("en-US", {
-    month: "short",
-    day: "2-digit",
-    year: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  });
 }
 
 export function ActivityRow({ entry }: { entry: MediaEntry }) {
@@ -67,9 +58,7 @@ export function ActivityRow({ entry }: { entry: MediaEntry }) {
             &ldquo;{entry.review}&rdquo;
           </p>
         )}
-        <p className="mt-1 text-xs text-zinc-500">
-          {formatActivityDate(entry.updatedAt)}
-        </p>
+        <ActivityDate dateString={entry.updatedAt} />
       </div>
     </div>
   );
