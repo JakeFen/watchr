@@ -55,6 +55,21 @@ export async function getMyMediaEntry(
   return toMediaEntry(await response.json());
 }
 
+// listMediaEntriesForUser lists a user's entries by their internal
+// users.id. Media entries aren't private, so this hits the backend's
+// public endpoint directly -- no Clerk token needed, and it works the
+// same whether userID is the caller's own id or someone else's.
+export async function listMediaEntriesForUser(userID: string): Promise<MediaEntry[]> {
+  const response = await fetch(`${BACKEND_URL}/users/${userID}/media-entries`, {
+    cache: "no-store",
+  });
+  if (!response.ok) {
+    throw new Error(`Failed to list media entries: ${response.status}`);
+  }
+  const entries: MediaEntryResponse[] = await response.json();
+  return entries.map(toMediaEntry);
+}
+
 export async function createMediaEntry(
   token: string,
   input: {

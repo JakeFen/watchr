@@ -110,6 +110,25 @@ func (h *Handler) CreateMediaEntry(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusCreated, entry)
 }
 
+// ListUserMediaEntries handles GET /users/{userID}/media-entries. No
+// auth required -- entries aren't private, so it returns all of
+// userID's entries regardless of status, for viewing another user's
+// profile. This is a separate endpoint from ListMyMediaEntries rather
+// than that one taking an optional user id, since they're identified
+// differently (an explicit path id here vs. the caller's auth token
+// there), not because the data returned differs.
+func (h *Handler) ListUserMediaEntries(w http.ResponseWriter, r *http.Request) {
+	userID := r.PathValue("userID")
+
+	entries, err := database.ListMediaEntriesByUserID(r.Context(), h.DB, userID)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "failed to list media entries")
+		return
+	}
+
+	writeJSON(w, http.StatusOK, entries)
+}
+
 // GetMyMediaEntryByTMDBID handles GET /media-entries/tmdb/{mediaType}/{tmdbID}.
 // It's the same single-entry lookup as GetMediaEntry, just keyed by the
 // TMDB media type and id (scoped to the caller) instead of the entry's
@@ -154,9 +173,9 @@ func (h *Handler) GetMyMediaEntryByTMDBID(w http.ResponseWriter, r *http.Request
 	writeJSON(w, http.StatusOK, entry)
 }
 
-// GetMediaEntry handles GET /media-entries/{id}. Any authenticated
-// user can look up any entry by id -- entries are posts other users
-// will eventually like and comment on, not private to their owner.
+// GetMediaEntry handles GET /media-entries/{id}. No auth required --
+// entries are posts other users will eventually like and comment on,
+// not private to their owner.
 func (h *Handler) GetMediaEntry(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	entry, err := database.GetMediaEntryByID(r.Context(), h.DB, id)

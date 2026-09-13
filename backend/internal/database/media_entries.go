@@ -57,10 +57,9 @@ func CreateMediaEntry(ctx context.Context, db DB, userID string, mediaType strin
 	return scanMediaEntry(row)
 }
 
-// GetMediaEntryByID fetches a single media entry, visible to userID
-// if either it's their own entry or it's been marked watched (i.e.
-// it's a published post, not just a personal list item). Returns
-// pgx.ErrNoRows if it doesn't exist or isn't visible to userID.
+// GetMediaEntryByID fetches a single media entry by its own id.
+// Entries aren't private, so this is open to anyone regardless of
+// ownership or status. Returns pgx.ErrNoRows if it doesn't exist.
 func GetMediaEntryByID(ctx context.Context, db DB, id string) (MediaEntry, error) {
 	row := db.QueryRow(ctx, `
 		SELECT `+mediaEntryColumns+`
@@ -83,6 +82,32 @@ func GetMediaEntryByUserAndTMDBID(ctx context.Context, db DB, userID string, med
 		userID, mediaType, tmdbID,
 	)
 	return scanMediaEntry(row)
+}
+
+// ListMediaEntriesByUserID fetches all of userID's own entries, most
+// recently created first.
+func ListMediaEntriesByUserID(ctx context.Context, db DB, userID string) ([]MediaEntry, error) {
+	rows, err := db.Query(ctx, `
+		SELECT `+mediaEntryColumns+`
+		FROM media_entries
+		WHERE user_id = $1
+		ORDER BY created_at DESC`,
+		userID,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	entries := []MediaEntry{}
+	for rows.Next() {
+		entry, err := scanMediaEntry(rows)
+		if err != nil {
+			return nil, err
+		}
+		entries = append(entries, entry)
+	}
+	return entries, rows.Err()
 }
 
 // UpdateMediaEntry updates an existing media entry's status, rating,
