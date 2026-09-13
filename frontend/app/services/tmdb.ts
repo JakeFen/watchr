@@ -11,7 +11,7 @@ const TMDB_API_BASE_URL = "https://api.themoviedb.org/3";
 const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p";
 const WATCH_REGION = "US";
 
-function tmdbImageUrl(width: TmdbImageWidth, path: string): string {
+export function tmdbImageUrl(width: TmdbImageWidth, path: string): string {
   return `${TMDB_IMAGE_BASE_URL}/${width}${path}`;
 }
 

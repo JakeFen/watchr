@@ -6,6 +6,12 @@ export enum WatchStatus {
   Watched = "watched",
 }
 
+export const WATCH_STATUS_LABEL: Record<WatchStatus, string> = {
+  [WatchStatus.Watched]: "Watched",
+  [WatchStatus.Watching]: "Watching",
+  [WatchStatus.WantToWatch]: "Want to Watch",
+};
+
 export type MediaItem = {
   id: string;
   mediaType: TmdbMediaType;

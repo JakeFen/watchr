@@ -17,3 +17,19 @@
   network call and a backend call for stats) has fully resolved. A
   `loading.tsx` for that route would fix the perceived "did my click
   even register" delay. Not needed for MVP.
+
+## Profile
+
+- The "Watched" tab (`WatchedTab` / `StatusMediaGrid`) doesn't show a
+  user's rating on each poster. `mediaEntryToMediaItem` doesn't carry
+  `entry.rating` through to the `MediaItem` it builds, so `MediaCard`'s
+  rating badge never renders there even though the data already
+  exists.
+
+## Friends
+
+- The "Friends" box and `/users/[userId]/friends` only ever show
+  accepted friendships. There's no way yet to see or act on pending
+  requests -- accept/decline an incoming one, or see that an outgoing
+  one is still pending -- even though `friendships.status` already
+  supports it, and no way to send a request in the first place.

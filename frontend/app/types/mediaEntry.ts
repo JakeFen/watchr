@@ -10,4 +10,17 @@ export type MediaEntry = {
   status: WatchStatus;
   rating: number | null;
   review: string | null;
+  updatedAt: string;
+};
+
+export type MediaEntryResponse = {
+  id: string;
+  media_type: TmdbMediaType;
+  tmdb_id: number;
+  title: string;
+  poster_path: string | null;
+  status: WatchStatus;
+  rating: number | null;
+  review: string | null;
+  updated_at: string;
 };

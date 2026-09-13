@@ -61,6 +61,7 @@ func main() {
 	mux.Handle("PATCH /media-entries/{id}", auth.RequireAuth(http.HandlerFunc(h.UpdateMediaEntry)))
 	mux.Handle("DELETE /media-entries/{id}", auth.RequireAuth(http.HandlerFunc(h.DeleteMediaEntry)))
 	mux.HandleFunc("GET /users/{userID}/media-entries", h.ListUserMediaEntries)
+	mux.HandleFunc("GET /users/{userID}/friends", h.ListUserFriends)
 
 	log.Printf("server listening on :%s", port)
 	if err := http.ListenAndServe(":"+port, mux); err != nil {

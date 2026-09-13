@@ -1,19 +1,8 @@
 import type { WatchStatus } from "../types/media";
-import type { MediaEntry } from "../types/mediaEntry";
+import type { MediaEntry, MediaEntryResponse } from "../types/mediaEntry";
 import type { TmdbMediaType } from "../types/tmdb";
 
 const BACKEND_URL = process.env.BACKEND_URL;
-
-type MediaEntryResponse = {
-  id: string;
-  media_type: TmdbMediaType;
-  tmdb_id: number;
-  title: string;
-  poster_path: string | null;
-  status: WatchStatus;
-  rating: number | null;
-  review: string | null;
-};
 
 function toMediaEntry(entry: MediaEntryResponse): MediaEntry {
   return {
@@ -25,6 +14,7 @@ function toMediaEntry(entry: MediaEntryResponse): MediaEntry {
     status: entry.status,
     rating: entry.rating,
     review: entry.review,
+    updatedAt: entry.updated_at,
   };
 }
 

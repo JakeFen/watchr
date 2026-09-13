@@ -85,13 +85,15 @@ func GetMediaEntryByUserAndTMDBID(ctx context.Context, db DB, userID string, med
 }
 
 // ListMediaEntriesByUserID fetches all of userID's own entries, most
-// recently created first.
+// recently updated first -- so a status change (e.g. want_to_watch ->
+// watched) bubbles back to the top like fresh activity, not just a
+// brand new entry.
 func ListMediaEntriesByUserID(ctx context.Context, db DB, userID string) ([]MediaEntry, error) {
 	rows, err := db.Query(ctx, `
 		SELECT `+mediaEntryColumns+`
 		FROM media_entries
 		WHERE user_id = $1
-		ORDER BY created_at DESC`,
+		ORDER BY updated_at DESC`,
 		userID,
 	)
 	if err != nil {
