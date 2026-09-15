@@ -67,6 +67,7 @@ func main() {
 	mux.Handle("DELETE /users/{userID}/friends", auth.RequireAuth(http.HandlerFunc(h.DeleteFriendship)))
 	mux.Handle("GET /users/{userID}/friendship-status", auth.RequireAuth(http.HandlerFunc(h.GetFriendshipStatus)))
 	mux.Handle("GET /users/{userID}/friend-requests", auth.RequireAuth(http.HandlerFunc(h.ListPendingFriendRequests)))
+	mux.Handle("GET /feed", auth.RequireAuth(http.HandlerFunc(h.GetFeed)))
 
 	log.Printf("server listening on :%s", port)
 	if err := http.ListenAndServe(":"+port, mux); err != nil {

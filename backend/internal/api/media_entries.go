@@ -129,6 +129,36 @@ func (h *Handler) ListUserMediaEntries(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, entries)
 }
 
+const defaultFeedLimit = 10
+
+// GetFeed handles GET /feed. The caller must be authenticated --
+// this is always "my feed," so there's no userID in the path. Returns
+// the caller's own recent activity plus their accepted friends',
+// most recently updated first. Accepts an optional ?limit= query
+// param (default 10).
+func (h *Handler) GetFeed(w http.ResponseWriter, r *http.Request) {
+	clerkUserID, ok := auth.ClerkUserID(r.Context())
+	if !ok {
+		writeError(w, http.StatusUnauthorized, "missing or invalid session")
+		return
+	}
+
+	limit := defaultFeedLimit
+	if raw := r.URL.Query().Get("limit"); raw != "" {
+		if parsed, err := strconv.Atoi(raw); err == nil && parsed > 0 {
+			limit = parsed
+		}
+	}
+
+	entries, err := database.ListFeedEntriesByUserID(r.Context(), h.DB, clerkUserID, limit)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "failed to load feed")
+		return
+	}
+
+	writeJSON(w, http.StatusOK, entries)
+}
+
 // GetMyMediaEntryByTMDBID handles GET /media-entries/tmdb/{mediaType}/{tmdbID}.
 // It's the same single-entry lookup as GetMediaEntry, just keyed by the
 // TMDB media type and id (scoped to the caller) instead of the entry's
