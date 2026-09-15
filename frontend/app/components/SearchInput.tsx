@@ -30,7 +30,7 @@ export function SearchInput({
       value={value}
       onChange={(event) => setValue(event.target.value)}
       onKeyDown={handleKeyDown}
-      className={`rounded-full border border-zinc-700 bg-zinc-900 px-5 py-3 text-sm text-zinc-100 placeholder:text-zinc-500 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 ${className}`}
+      className={`rounded-full border border-zinc-700 bg-zinc-800 px-5 py-3 text-sm text-zinc-100 placeholder:text-zinc-500 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 ${className}`}
     />
   );
 }

@@ -10,7 +10,7 @@ export function SearchBar({ query }: { query: string }) {
     <SearchInput
       initialValue={query}
       onSubmit={(next) => router.replace(`/search?${new URLSearchParams({ q: next })}`)}
-      className="w-full max-w-2xl"
+      className="mx-auto block w-full max-w-2xl"
     />
   );
 }
