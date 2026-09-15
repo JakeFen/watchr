@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 )
 
@@ -46,27 +47,37 @@ func ListFriendsByUserID(ctx context.Context, db DB, userID string) ([]Friend, e
 	return friends, rows.Err()
 }
 
+// GetFriendshipStatus returns the status ("pending" or "accepted") of
+// any friendship row between the two users, in either direction, or
+// "" if none exists.
+func GetFriendshipStatus(ctx context.Context, db DB, userID string, otherUserID string) (string, error) {
+	var status string
+	err := db.QueryRow(ctx, `
+		SELECT status FROM friendships
+		WHERE (requester_id = $1 AND addressee_id = $2) OR (requester_id = $2 AND addressee_id = $1)`,
+		userID, otherUserID,
+	).Scan(&status)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return "", nil
+	}
+	return status, err
+}
+
 // CreateFriendRequest creates a pending friendship from requesterID to
 // addresseeID. Returns ErrFriendshipExists if a friendship already
 // exists between the two in either direction -- the table's UNIQUE
 // (requester_id, addressee_id) constraint only catches the exact same
 // direction, so this checks both explicitly first.
 func CreateFriendRequest(ctx context.Context, db DB, requesterID string, addresseeID string) error {
-	var exists bool
-	if err := db.QueryRow(ctx, `
-		SELECT EXISTS (
-			SELECT 1 FROM friendships
-			WHERE (requester_id = $1 AND addressee_id = $2) OR (requester_id = $2 AND addressee_id = $1)
-		)`,
-		requesterID, addresseeID,
-	).Scan(&exists); err != nil {
+	status, err := GetFriendshipStatus(ctx, db, requesterID, addresseeID)
+	if err != nil {
 		return err
 	}
-	if exists {
+	if status != "" {
 		return ErrFriendshipExists
 	}
 
-	_, err := db.Exec(ctx,
+	_, err = db.Exec(ctx,
 		`INSERT INTO friendships (requester_id, addressee_id, status) VALUES ($1, $2, 'pending')`,
 		requesterID, addresseeID,
 	)

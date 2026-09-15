@@ -1,8 +1,7 @@
+import { backendFetch, backendUrl } from "./backendFetch";
 import type { WatchStatus } from "../types/media";
 import type { MediaEntry, MediaEntryResponse } from "../types/mediaEntry";
 import type { TmdbMediaType } from "../types/tmdb";
-
-const BACKEND_URL = process.env.BACKEND_URL;
 
 function toMediaEntry(entry: MediaEntryResponse): MediaEntry {
   return {
@@ -16,18 +15,6 @@ function toMediaEntry(entry: MediaEntryResponse): MediaEntry {
     review: entry.review,
     updatedAt: entry.updated_at,
   };
-}
-
-function backendFetch(token: string, path: string, init?: RequestInit): Promise<Response> {
-  return fetch(`${BACKEND_URL}${path}`, {
-    ...init,
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-      ...init?.headers,
-    },
-    cache: "no-store",
-  });
 }
 
 export async function getMyMediaEntry(
@@ -50,7 +37,7 @@ export async function getMyMediaEntry(
 // public endpoint directly -- no Clerk token needed, and it works the
 // same whether userID is the caller's own id or someone else's.
 export async function listMediaEntriesForUser(userID: string): Promise<MediaEntry[]> {
-  const response = await fetch(`${BACKEND_URL}/users/${userID}/media-entries`, {
+  const response = await fetch(backendUrl(`/users/${userID}/media-entries`), {
     cache: "no-store",
   });
   if (!response.ok) {

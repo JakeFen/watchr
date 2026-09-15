@@ -15,6 +15,7 @@ export function Button({
   rel,
   className = "",
   onClick,
+  disabled,
   children,
 }: {
   variant?: ButtonVariant;
@@ -23,9 +24,10 @@ export function Button({
   rel?: string;
   className?: string;
   onClick?: MouseEventHandler;
+  disabled?: boolean;
   children?: ReactNode;
 }) {
-  const classes = `cursor-pointer text-base font-semibold transition-colors ${VARIANT_CLASSNAME[variant]} ${className}`;
+  const classes = `cursor-pointer text-base font-semibold transition-colors disabled:cursor-wait disabled:opacity-60 ${VARIANT_CLASSNAME[variant]} ${className}`;
 
   if (href) {
     return (
@@ -36,7 +38,7 @@ export function Button({
   }
 
   return (
-    <button className={classes} onClick={onClick}>
+    <button type="button" disabled={disabled} className={classes} onClick={onClick}>
       {children}
     </button>
   );
