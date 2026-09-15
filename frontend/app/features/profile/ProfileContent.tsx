@@ -7,7 +7,7 @@ export function ProfileContent({ userId }: { userId: string }) {
   return (
     <div className="flex flex-col gap-6 py-8">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <ProfileHeader />
+        <ProfileHeader userId={userId} />
         <ProfileStats userId={userId} />
       </div>
 

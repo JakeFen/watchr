@@ -1,10 +1,10 @@
-import { currentUser } from "@clerk/nextjs/server";
+import { clerkClient } from "@clerk/nextjs/server";
 import { PersonSilhouette } from "../../components/PersonSilhouette";
 
-export async function ProfileHeader() {
-  const user = await currentUser();
-  const displayName =
-    user?.username ?? user?.firstName ?? user?.primaryEmailAddress?.emailAddress ?? "Account";
+export async function ProfileHeader({ userId }: { userId: string }) {
+  const client = await clerkClient();
+  const user = await client.users.getUser(userId).catch(() => null);
+  const displayName = user?.username ?? user?.firstName ?? "Account";
 
   return (
     <div className="flex items-center gap-4">
