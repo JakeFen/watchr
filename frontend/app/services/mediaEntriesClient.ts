@@ -8,6 +8,8 @@ export async function createMediaEntry(input: {
   title: string;
   posterPath?: string;
   status: WatchStatus;
+  rating?: number | null;
+  review?: string | null;
 }): Promise<MediaEntry> {
   const response = await fetch("/api/media-entries", {
     method: "POST",
@@ -20,11 +22,15 @@ export async function createMediaEntry(input: {
   return response.json();
 }
 
-export async function updateMediaEntryStatus(id: string, status: WatchStatus): Promise<MediaEntry> {
+export async function updateMediaEntryStatus(
+  id: string,
+  status: WatchStatus,
+  details?: { rating?: number | null; review?: string | null },
+): Promise<MediaEntry> {
   const response = await fetch(`/api/media-entries/${id}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ status }),
+    body: JSON.stringify({ status, rating: details?.rating, review: details?.review }),
   });
   if (!response.ok) {
     throw new Error("Failed to update media entry");

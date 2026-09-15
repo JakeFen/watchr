@@ -1,12 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "./Button";
 import { useMediaEntry } from "../hooks/useMediaEntry";
-import { ButtonVariant } from "../types/button";
 import { WatchStatus } from "../types/media";
 import type { MediaEntry } from "../types/mediaEntry";
 import type { TmdbMediaType } from "../types/tmdb";
+import { WatchedRatingModal } from "./WatchedRatingModal";
 
 const ALL_STATUSES: WatchStatus[] = [WatchStatus.WantToWatch, WatchStatus.Watching, WatchStatus.Watched];
 
@@ -31,7 +30,7 @@ export function MediaActions({
   initialEntry: MediaEntry | null;
   isSignedIn: boolean;
 }) {
-  const { status, isSaving, error, setStatus, remove } = useMediaEntry({
+  const { status, isSaving, error, setStatus, saveWatched, remove } = useMediaEntry({
     mediaType,
     tmdbId,
     title,
@@ -64,10 +63,15 @@ export function MediaActions({
       return;
     }
 
-    await setStatus(next);
+    // Watched is deferred to the modal -- nothing is saved until the
+    // user actually submits or skips it there, so "Watched" plus a
+    // rating/review become one save instead of two.
     if (next === WatchStatus.Watched) {
       setIsModalOpen(true);
+      return;
     }
+
+    await setStatus(next);
   }
 
   return (
@@ -136,46 +140,16 @@ export function MediaActions({
       </div>
 
       {isModalOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
-          onClick={() => setIsModalOpen(false)}
-        >
-          <div
-            className="w-full max-w-sm rounded-lg bg-zinc-800 p-6 shadow-2xl"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <h2 className="text-lg font-semibold text-zinc-100">
-              Marked as watched
-            </h2>
-            <p className="mt-1 text-sm text-zinc-400">
-              Want to leave your thoughts?
-            </p>
-
-            <div className="mt-5 flex flex-col gap-2">
-              <Button
-                variant={ButtonVariant.Primary}
-                className="w-full"
-                onClick={() => setIsModalOpen(false)}
-              >
-                Leave a Rating
-              </Button>
-              <Button
-                variant={ButtonVariant.Secondary}
-                className="w-full"
-                onClick={() => setIsModalOpen(false)}
-              >
-                Leave a Review
-              </Button>
-              <button
-                type="button"
-                onClick={() => setIsModalOpen(false)}
-                className="mt-1 cursor-pointer text-sm text-zinc-500 hover:text-zinc-300"
-              >
-                Skip
-              </button>
-            </div>
-          </div>
-        </div>
+        <WatchedRatingModal
+          isSaving={isSaving}
+          onSave={async (rating, review) => {
+            const success = await saveWatched(rating, review);
+            if (success) {
+              setIsModalOpen(false);
+            }
+            return success;
+          }}
+        />
       )}
     </>
   );

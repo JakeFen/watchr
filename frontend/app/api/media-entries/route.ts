@@ -16,6 +16,8 @@ export async function POST(request: Request) {
     title: string;
     posterPath?: string;
     status: WatchStatus;
+    rating?: number | null;
+    review?: string | null;
   } = await request.json();
 
   const token = await getToken();

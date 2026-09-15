@@ -55,6 +55,8 @@ export async function createMediaEntry(
     title: string;
     posterPath?: string;
     status: WatchStatus;
+    rating?: number | null;
+    review?: string | null;
   },
 ): Promise<MediaEntry> {
   const response = await backendFetch(token, "/media-entries", {
@@ -65,6 +67,8 @@ export async function createMediaEntry(
       title: input.title,
       poster_path: input.posterPath ?? null,
       status: input.status,
+      rating: input.rating,
+      review: input.review,
     }),
   });
   if (!response.ok) {
@@ -77,10 +81,11 @@ export async function updateMediaEntryStatus(
   token: string,
   id: string,
   status: WatchStatus,
+  details?: { rating?: number | null; review?: string | null },
 ): Promise<MediaEntry> {
   const response = await backendFetch(token, `/media-entries/${id}`, {
     method: "PATCH",
-    body: JSON.stringify({ status }),
+    body: JSON.stringify({ status, rating: details?.rating, review: details?.review }),
   });
   if (!response.ok) {
     throw new Error(`Failed to update media entry: ${response.status}`);

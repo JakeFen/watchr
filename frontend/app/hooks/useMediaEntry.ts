@@ -7,7 +7,7 @@ import {
   deleteMediaEntry,
   updateMediaEntryStatus,
 } from "../services/mediaEntriesClient";
-import type { WatchStatus } from "../types/media";
+import { WatchStatus } from "../types/media";
 import type { MediaEntry } from "../types/mediaEntry";
 import type { TmdbMediaType } from "../types/tmdb";
 
@@ -56,6 +56,29 @@ export function useMediaEntry({
     }
   }
 
+  // saveWatched marks the entry watched and sets rating/review in one
+  // call -- used by the post-watched modal so clicking "Watched"
+  // itself doesn't save anything until the user actually submits or
+  // skips that modal.
+  async function saveWatched(rating: number | null, review: string | null): Promise<boolean> {
+    if (!requireSignIn()) return false;
+
+    setIsSaving(true);
+    setError(null);
+    try {
+      const updated = entry
+        ? await updateMediaEntryStatus(entry.id, WatchStatus.Watched, { rating, review })
+        : await createMediaEntry({ mediaType, tmdbId, title, posterPath, status: WatchStatus.Watched, rating, review });
+      setEntry(updated);
+      return true;
+    } catch {
+      setError("Couldn't save that -- try again.");
+      return false;
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
   async function remove() {
     if (!entry || !requireSignIn()) return;
 
@@ -76,6 +99,7 @@ export function useMediaEntry({
     isSaving,
     error,
     setStatus,
+    saveWatched,
     remove,
   };
 }

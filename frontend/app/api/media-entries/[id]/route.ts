@@ -10,14 +10,15 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   }
 
   const { id } = await params;
-  const { status }: { status: WatchStatus } = await request.json();
+  const { status, rating, review }: { status: WatchStatus; rating?: number | null; review?: string | null } =
+    await request.json();
 
   const token = await getToken();
   if (!token) {
     return NextResponse.json({ error: "not signed in" }, { status: 401 });
   }
 
-  const entry = await updateMediaEntryStatus(token, id, status);
+  const entry = await updateMediaEntryStatus(token, id, status, { rating, review });
   return NextResponse.json(entry);
 }
 

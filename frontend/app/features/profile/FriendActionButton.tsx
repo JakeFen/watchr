@@ -7,7 +7,7 @@ import { FriendshipStatus } from "../../types/friendshipStatus";
 
 const BUTTON_LABEL: Record<FriendshipStatus, string> = {
   [FriendshipStatus.None]: "Add Friend",
-  [FriendshipStatus.Pending]: "Pending",
+  [FriendshipStatus.Pending]: "Cancel Request",
   [FriendshipStatus.Accepted]: "Remove Friend",
 };
 

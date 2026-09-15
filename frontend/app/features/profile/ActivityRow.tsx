@@ -4,18 +4,13 @@ import { WatchStatus } from "../../types/media";
 import type { MediaEntry } from "../../types/mediaEntry";
 import { ActivityDate } from "./ActivityDate";
 import { mediaEntryToMediaItem } from "./mediaEntryToMediaItem";
-
-// TODO: Check ratingStars when rating model is implemented. Rearrange this component to also allow updating media status
+import { ratingStars } from "./ratingStars";
 
 const ACTION_VERB: Record<WatchStatus, string> = {
   [WatchStatus.Watched]: "watched",
   [WatchStatus.Watching]: "is watching",
   [WatchStatus.WantToWatch]: "wants to watch",
 };
-
-function ratingStars(rating: number): string {
-  return "★".repeat(rating) + "☆".repeat(5 - rating);
-}
 
 export function ActivityRow({ entry }: { entry: MediaEntry }) {
   const item = mediaEntryToMediaItem(entry);
@@ -42,7 +37,7 @@ export function ActivityRow({ entry }: { entry: MediaEntry }) {
         <p className="text-sm text-zinc-400">
           {ACTION_VERB[entry.status]}
           {entry.status === WatchStatus.Watched && entry.rating && (
-            <span className="ml-2 text-amber-400">
+            <span className="ml-2 text-green-400">
               {ratingStars(entry.rating)}
             </span>
           )}
