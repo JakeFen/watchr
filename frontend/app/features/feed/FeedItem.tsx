@@ -1,8 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Button } from "../../components/Button";
 import { PersonSilhouette } from "../../components/PersonSilhouette";
-import { ButtonVariant } from "../../types/button";
 import { WatchStatus } from "../../types/media";
 import type { FeedEntry } from "../../types/mediaEntry";
 import type { UserSummary } from "../../types/userSummary";
@@ -17,10 +15,7 @@ const ACTION_VERB: Record<WatchStatus, string> = {
   [WatchStatus.WantToWatch]: "wants to watch",
 };
 
-// Comments are visual only for now -- no backend support yet, so
-// nothing here is wired to save anything. Liking is wired up for
-// real, and only lives here -- FeedItem is currently only ever
-// rendered from the feed.
+// FeedItem is currently only ever rendered from the feed.
 export function FeedItem({ entry, actor }: { entry: FeedEntry; actor: UserSummary | null }) {
   const item = mediaEntryToMediaItem(entry);
   const href = `/discover/${item.id}?type=${item.mediaType}`;
@@ -71,17 +66,6 @@ export function FeedItem({ entry, actor }: { entry: FeedEntry; actor: UserSummar
 
           <LikeButton mediaEntryId={entry.id} initialLiked={entry.likedByMe} initialCount={entry.likeCount} />
         </div>
-      </div>
-
-      <div className="mt-3 flex items-end gap-2">
-        <textarea
-          placeholder="Write a comment..."
-          rows={2}
-          className="flex-1 resize-none rounded border border-zinc-700 bg-zinc-900 p-2 text-sm text-zinc-100 placeholder:text-zinc-500 focus:border-blue-500 focus:outline-none"
-        />
-        <Button variant={ButtonVariant.Primary} className="px-4 py-1.5 text-sm">
-          Post
-        </Button>
       </div>
     </div>
   );
