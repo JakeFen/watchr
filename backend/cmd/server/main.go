@@ -60,6 +60,8 @@ func main() {
 	mux.HandleFunc("GET /media-entries/{id}", h.GetMediaEntry)
 	mux.Handle("PATCH /media-entries/{id}", auth.RequireAuth(http.HandlerFunc(h.UpdateMediaEntry)))
 	mux.Handle("DELETE /media-entries/{id}", auth.RequireAuth(http.HandlerFunc(h.DeleteMediaEntry)))
+	mux.Handle("POST /media-entries/{id}/like", auth.RequireAuth(http.HandlerFunc(h.LikeMediaEntry)))
+	mux.Handle("DELETE /media-entries/{id}/like", auth.RequireAuth(http.HandlerFunc(h.UnlikeMediaEntry)))
 	mux.HandleFunc("GET /users/{userID}/media-entries", h.ListUserMediaEntries)
 	mux.HandleFunc("GET /users/{userID}/friends", h.ListUserFriends)
 	mux.Handle("POST /users/{userID}/friends", auth.RequireAuth(http.HandlerFunc(h.CreateFriendRequest)))

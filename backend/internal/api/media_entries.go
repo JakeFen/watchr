@@ -273,6 +273,73 @@ func (h *Handler) UpdateMediaEntry(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, entry)
 }
 
+// LikeMediaEntry handles POST /media-entries/{id}/like. The caller
+// must be authenticated. Liking your own entry is allowed -- there's
+// no reason to special-case it. Liking an entry you've already liked
+// is rejected as a conflict, and liking one that doesn't exist as a
+// 404, mirroring CreateFriendRequest's error handling.
+func (h *Handler) LikeMediaEntry(w http.ResponseWriter, r *http.Request) {
+	clerkUserID, ok := auth.ClerkUserID(r.Context())
+	if !ok {
+		writeError(w, http.StatusUnauthorized, "missing or invalid session")
+		return
+	}
+
+	userID, err := database.GetOrCreateUser(r.Context(), h.DB, clerkUserID)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "failed to resolve user")
+		return
+	}
+
+	id := r.PathValue("id")
+	err = database.LikeMediaEntry(r.Context(), h.DB, userID, id)
+	if errors.Is(err, database.ErrMediaEntryNotFound) {
+		writeError(w, http.StatusNotFound, "media entry not found")
+		return
+	}
+	if errors.Is(err, database.ErrLikeExists) {
+		writeError(w, http.StatusConflict, "already liked this media entry")
+		return
+	}
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "failed to like media entry")
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
+// UnlikeMediaEntry handles DELETE /media-entries/{id}/like. The
+// caller must be authenticated. Unliking an entry that isn't liked
+// (or doesn't exist) responds 404, so callers can't use this to probe
+// which ids exist.
+func (h *Handler) UnlikeMediaEntry(w http.ResponseWriter, r *http.Request) {
+	clerkUserID, ok := auth.ClerkUserID(r.Context())
+	if !ok {
+		writeError(w, http.StatusUnauthorized, "missing or invalid session")
+		return
+	}
+
+	userID, err := database.GetOrCreateUser(r.Context(), h.DB, clerkUserID)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "failed to resolve user")
+		return
+	}
+
+	id := r.PathValue("id")
+	unliked, err := database.UnlikeMediaEntry(r.Context(), h.DB, userID, id)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "failed to unlike media entry")
+		return
+	}
+	if !unliked {
+		writeError(w, http.StatusNotFound, "like not found")
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
 // DeleteMediaEntry handles DELETE /media-entries/{id}. Only the
 // entry's owner may delete it; a mismatched owner and a missing id
 // both respond 404, so callers can't use this to probe which ids

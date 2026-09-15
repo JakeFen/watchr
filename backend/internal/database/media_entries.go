@@ -17,6 +17,7 @@ type MediaEntry struct {
 	Review     *string   `json:"review"`
 	CreatedAt  time.Time `json:"created_at"`
 	UpdatedAt  time.Time `json:"updated_at"`
+	LikeCount  int64     `json:"like_count"`
 }
 
 const (
@@ -30,7 +31,14 @@ const (
 	MediaTypeTv    = "tv"
 )
 
-const mediaEntryColumns = `id, user_id, media_type, tmdb_id, title, poster_path, status, rating, review, created_at, updated_at`
+// like_count is a correlated subquery rather than a join so this same
+// column list works unchanged in both SELECT and INSERT/UPDATE
+// RETURNING contexts. The outer reference must be qualified as
+// media_entries.id -- media_entry_likes has its own `id` primary key
+// column, which would otherwise shadow the correlation and silently
+// match each like against itself instead of the entry.
+const mediaEntryColumns = `id, user_id, media_type, tmdb_id, title, poster_path, status, rating, review, created_at, updated_at,
+	(SELECT COUNT(*) FROM media_entry_likes WHERE media_entry_id = media_entries.id) AS like_count`
 
 func scanMediaEntry(row interface {
 	Scan(dest ...any) error
@@ -38,7 +46,7 @@ func scanMediaEntry(row interface {
 	var e MediaEntry
 	err := row.Scan(
 		&e.ID, &e.UserID, &e.MediaType, &e.TMDBID, &e.Title, &e.PosterPath,
-		&e.Status, &e.Rating, &e.Review, &e.CreatedAt, &e.UpdatedAt,
+		&e.Status, &e.Rating, &e.Review, &e.CreatedAt, &e.UpdatedAt, &e.LikeCount,
 	)
 	return e, err
 }
