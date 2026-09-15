@@ -1,13 +1,16 @@
 import { Button } from "../../components/Button";
 import { UserListItem } from "../../components/UserListItem";
 import { listFriendsForUser } from "../../services/friendships";
+import { getUsersByIds } from "../../services/users";
 import { ButtonVariant } from "../../types/button";
 
 const PREVIEW_COUNT = 5;
 const MAX_DISPLAYED_COUNT = 500;
 
 export async function FriendsList({ userId }: { userId: string }) {
-  const friends = await listFriendsForUser(userId).catch(() => []);
+  const friends = await listFriendsForUser(userId)
+    .then(getUsersByIds)
+    .catch(() => []);
   const countLabel =
     friends.length > MAX_DISPLAYED_COUNT ? `${MAX_DISPLAYED_COUNT}+` : friends.length;
 

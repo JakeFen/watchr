@@ -8,27 +8,21 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 )
 
-type Friend struct {
-	ID       string  `json:"id"`
-	Username *string `json:"username"`
-}
-
 // ErrFriendshipExists is returned by CreateFriendRequest when a
 // friendship row -- in either direction, any status -- already exists
 // between the two users.
 var ErrFriendshipExists = errors.New("friendship already exists")
 
-// ListFriendsByUserID fetches userID's accepted friends -- the other
-// user in each friendship row where userID is either side, since a
-// friendship becomes mutual once accepted regardless of who sent the
-// original request.
-func ListFriendsByUserID(ctx context.Context, db DB, userID string) ([]Friend, error) {
+// ListFriendsByUserID fetches the ids of userID's accepted friends --
+// the other user in each friendship row where userID is either side,
+// since a friendship becomes mutual once accepted regardless of who
+// sent the original request. Display info (username, etc.) isn't
+// stored here -- callers resolve that from Clerk themselves.
+func ListFriendsByUserID(ctx context.Context, db DB, userID string) ([]string, error) {
 	rows, err := db.Query(ctx, `
-		SELECT u.id, u.username
-		FROM friendships f
-		JOIN users u ON u.id = CASE WHEN f.requester_id = $1 THEN f.addressee_id ELSE f.requester_id END
-		WHERE f.status = 'accepted' AND (f.requester_id = $1 OR f.addressee_id = $1)
-		ORDER BY u.username`,
+		SELECT CASE WHEN requester_id = $1 THEN addressee_id ELSE requester_id END
+		FROM friendships
+		WHERE status = 'accepted' AND (requester_id = $1 OR addressee_id = $1)`,
 		userID,
 	)
 	if err != nil {
@@ -36,15 +30,15 @@ func ListFriendsByUserID(ctx context.Context, db DB, userID string) ([]Friend, e
 	}
 	defer rows.Close()
 
-	friends := []Friend{}
+	ids := []string{}
 	for rows.Next() {
-		var f Friend
-		if err := rows.Scan(&f.ID, &f.Username); err != nil {
+		var id string
+		if err := rows.Scan(&id); err != nil {
 			return nil, err
 		}
-		friends = append(friends, f)
+		ids = append(ids, id)
 	}
-	return friends, rows.Err()
+	return ids, rows.Err()
 }
 
 // GetFriendshipStatus returns the status ("pending" or "accepted") of

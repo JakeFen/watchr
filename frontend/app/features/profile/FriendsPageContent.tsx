@@ -1,8 +1,11 @@
 import { UserListItem } from "../../components/UserListItem";
 import { listFriendsForUser } from "../../services/friendships";
+import { getUsersByIds } from "../../services/users";
 
 export async function FriendsPageContent({ userId }: { userId: string }) {
-  const friends = await listFriendsForUser(userId).catch(() => []);
+  const friends = await listFriendsForUser(userId)
+    .then(getUsersByIds)
+    .catch(() => []);
 
   return (
     <div className="py-8">

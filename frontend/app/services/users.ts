@@ -16,3 +16,18 @@ export async function searchUsers(query: string): Promise<UserSummary[]> {
     .filter((user) => user.username?.toLowerCase().includes(needle))
     .map((user) => ({ id: user.id, username: user.username }));
 }
+
+// getUsersByIds resolves a list of ids to their real Clerk usernames
+// in one batched call, dropping any without one. Preserves the input
+// order.
+export async function getUsersByIds(ids: string[]): Promise<UserSummary[]> {
+  if (ids.length === 0) {
+    return [];
+  }
+
+  const client = await clerkClient();
+  const { data } = await client.users.getUserList({ userId: ids, limit: ids.length });
+  const byId = new Map(data.filter((user) => user.username).map((user) => [user.id, user.username]));
+
+  return ids.filter((id) => byId.has(id)).map((id) => ({ id, username: byId.get(id) ?? null }));
+}

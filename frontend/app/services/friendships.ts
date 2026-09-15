@@ -1,11 +1,11 @@
 import { backendFetch, backendUrl } from "./backendFetch";
 import type { FriendshipStatus } from "../types/friendshipStatus";
-import type { UserSummary } from "../types/userSummary";
 
-// listFriendsForUser lists a user's accepted friends by their id.
+// listFriendsForUser lists the ids of a user's accepted friends.
 // Friendships aren't private, so this hits the backend's public
-// endpoint directly -- no Clerk token needed.
-export async function listFriendsForUser(userID: string): Promise<UserSummary[]> {
+// endpoint directly -- no Clerk token needed. Display info isn't
+// included -- resolve that from Clerk (see services/users.ts).
+export async function listFriendsForUser(userID: string): Promise<string[]> {
   const response = await fetch(backendUrl(`/users/${userID}/friends`), {
     cache: "no-store",
   });
