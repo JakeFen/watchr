@@ -114,10 +114,10 @@ func ListMediaEntriesByUserID(ctx context.Context, db DB, userID string) ([]Medi
 
 // ListFeedEntriesByUserID fetches recent activity for userID's feed --
 // their own entries plus their accepted friends', most recently
-// updated first, capped at limit. A status change bubbles an entry
-// back to the top the same way it does for a single profile's
-// Recent Activities.
-func ListFeedEntriesByUserID(ctx context.Context, db DB, userID string, limit int) ([]MediaEntry, error) {
+// updated first, capped at limit and starting after offset entries. A
+// status change bubbles an entry back to the top the same way it does
+// for a single profile's Recent Activities.
+func ListFeedEntriesByUserID(ctx context.Context, db DB, userID string, limit int, offset int) ([]MediaEntry, error) {
 	rows, err := db.Query(ctx, `
 		SELECT `+mediaEntryColumns+`
 		FROM media_entries
@@ -128,8 +128,8 @@ func ListFeedEntriesByUserID(ctx context.Context, db DB, userID string, limit in
 		       WHERE status = 'accepted' AND (requester_id = $1 OR addressee_id = $1)
 		   )
 		ORDER BY updated_at DESC
-		LIMIT $2`,
-		userID, limit,
+		LIMIT $2 OFFSET $3`,
+		userID, limit, offset,
 	)
 	if err != nil {
 		return nil, err

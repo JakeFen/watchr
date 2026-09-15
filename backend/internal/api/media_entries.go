@@ -134,8 +134,8 @@ const defaultFeedLimit = 10
 // GetFeed handles GET /feed. The caller must be authenticated --
 // this is always "my feed," so there's no userID in the path. Returns
 // the caller's own recent activity plus their accepted friends',
-// most recently updated first. Accepts an optional ?limit= query
-// param (default 10).
+// most recently updated first. Accepts optional ?limit= (default 10)
+// and ?offset= (default 0) query params for paging through the feed.
 func (h *Handler) GetFeed(w http.ResponseWriter, r *http.Request) {
 	clerkUserID, ok := auth.ClerkUserID(r.Context())
 	if !ok {
@@ -150,7 +150,14 @@ func (h *Handler) GetFeed(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	entries, err := database.ListFeedEntriesByUserID(r.Context(), h.DB, clerkUserID, limit)
+	offset := 0
+	if raw := r.URL.Query().Get("offset"); raw != "" {
+		if parsed, err := strconv.Atoi(raw); err == nil && parsed > 0 {
+			offset = parsed
+		}
+	}
+
+	entries, err := database.ListFeedEntriesByUserID(r.Context(), h.DB, clerkUserID, limit, offset)
 	if err != nil {
 		writeError(w, http.StatusInternalServerError, "failed to load feed")
 		return

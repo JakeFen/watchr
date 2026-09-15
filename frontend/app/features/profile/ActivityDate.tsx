@@ -24,12 +24,18 @@ function subscribe() {
 // SSR/hydration and the locale-correct time once mounted
 // client-side, without the setState-in-effect that a plain
 // useState/useEffect version would need.
-export function ActivityDate({ dateString }: { dateString: string }) {
+export function ActivityDate({
+  dateString,
+  className = "mt-1 text-xs text-zinc-500",
+}: {
+  dateString: string;
+  className?: string;
+}) {
   const formatted = useSyncExternalStore(
     subscribe,
     () => formatActivityDate(dateString),
     () => null,
   );
 
-  return <p className="mt-1 text-xs text-zinc-500">{formatted}</p>;
+  return <p className={className}>{formatted}</p>;
 }

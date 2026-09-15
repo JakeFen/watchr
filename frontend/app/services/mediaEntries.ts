@@ -6,6 +6,7 @@ import type { TmdbMediaType } from "../types/tmdb";
 function toMediaEntry(entry: MediaEntryResponse): MediaEntry {
   return {
     id: entry.id,
+    userId: entry.user_id,
     mediaType: entry.media_type,
     tmdbId: entry.tmdb_id,
     title: entry.title,
@@ -15,6 +16,27 @@ function toMediaEntry(entry: MediaEntryResponse): MediaEntry {
     review: entry.review,
     updatedAt: entry.updated_at,
   };
+}
+
+// getFeed returns a page of the caller's recent activity feed --
+// their own entries plus their accepted friends', most recently
+// updated first. offset skips that many entries, for paging through
+// the feed past the first `limit`.
+export async function getFeed(token: string, limit?: number, offset?: number): Promise<MediaEntry[]> {
+  const params = new URLSearchParams();
+  if (limit) {
+    params.set("limit", String(limit));
+  }
+  if (offset) {
+    params.set("offset", String(offset));
+  }
+  const query = params.size > 0 ? `?${params}` : "";
+  const response = await backendFetch(token, `/feed${query}`);
+  if (!response.ok) {
+    throw new Error(`Failed to load feed: ${response.status}`);
+  }
+  const entries: MediaEntryResponse[] = await response.json();
+  return entries.map(toMediaEntry);
 }
 
 export async function getMyMediaEntry(

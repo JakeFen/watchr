@@ -3,6 +3,7 @@ import type { TmdbMediaType } from "./tmdb";
 
 export type MediaEntry = {
   id: string;
+  userId: string;
   mediaType: TmdbMediaType;
   tmdbId: number;
   title: string;
@@ -15,6 +16,7 @@ export type MediaEntry = {
 
 export type MediaEntryResponse = {
   id: string;
+  user_id: string;
   media_type: TmdbMediaType;
   tmdb_id: number;
   title: string;

@@ -1,6 +1,7 @@
 import { Show } from "@clerk/nextjs";
 import { MediaRow } from "../../components/MediaRow";
 import { getTrendingMovies, getTrendingShows } from "../../services/tmdb";
+import { Feed } from "../feed/Feed";
 import { Hero } from "./Hero";
 
 export async function LandingContent() {
@@ -17,7 +18,7 @@ export async function LandingContent() {
         <MediaRow title="Trending Shows" items={trendingShows} />
       </Show>
       <Show when="signed-in">
-        <p>Signed In</p>
+        <Feed />
       </Show>
     </>
   );
