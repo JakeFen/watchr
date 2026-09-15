@@ -4,11 +4,12 @@ import { Button } from "../../components/Button";
 import { PersonSilhouette } from "../../components/PersonSilhouette";
 import { ButtonVariant } from "../../types/button";
 import { WatchStatus } from "../../types/media";
-import type { MediaEntry } from "../../types/mediaEntry";
+import type { FeedEntry } from "../../types/mediaEntry";
 import type { UserSummary } from "../../types/userSummary";
 import { ActivityDate } from "../profile/ActivityDate";
 import { mediaEntryToMediaItem } from "../profile/mediaEntryToMediaItem";
 import { ratingStars } from "../profile/ratingStars";
+import { LikeButton } from "./LikeButton";
 
 const ACTION_VERB: Record<WatchStatus, string> = {
   [WatchStatus.Watched]: "watched",
@@ -16,9 +17,11 @@ const ACTION_VERB: Record<WatchStatus, string> = {
   [WatchStatus.WantToWatch]: "wants to watch",
 };
 
-// Like/comment are visual only for now -- no backend support yet, so
-// nothing here is wired to save anything.
-export function FeedItem({ entry, actor }: { entry: MediaEntry; actor: UserSummary | null }) {
+// Comments are visual only for now -- no backend support yet, so
+// nothing here is wired to save anything. Liking is wired up for
+// real, and only lives here -- FeedItem is currently only ever
+// rendered from the feed.
+export function FeedItem({ entry, actor }: { entry: FeedEntry; actor: UserSummary | null }) {
   const item = mediaEntryToMediaItem(entry);
   const href = `/discover/${item.id}?type=${item.mediaType}`;
   const profileHref = `/users/${entry.userId}`;
@@ -66,12 +69,7 @@ export function FeedItem({ entry, actor }: { entry: MediaEntry; actor: UserSumma
             </blockquote>
           )}
 
-          <button
-            type="button"
-            className="mt-3 flex cursor-pointer items-center gap-1 text-sm text-zinc-400 hover:text-red-400"
-          >
-            <span className="text-base">♡</span> Like
-          </button>
+          <LikeButton mediaEntryId={entry.id} initialLiked={entry.likedByMe} initialCount={entry.likeCount} />
         </div>
       </div>
 

@@ -120,14 +120,39 @@ func ListMediaEntriesByUserID(ctx context.Context, db DB, userID string) ([]Medi
 	return entries, rows.Err()
 }
 
+// FeedEntry is a MediaEntry plus whether the feed's viewer has liked
+// it -- only meaningful in a viewer-scoped listing like the feed, not
+// on a MediaEntry viewed on its own (e.g. GetMediaEntry has no
+// authenticated viewer to check against).
+type FeedEntry struct {
+	MediaEntry
+	LikedByMe bool `json:"liked_by_me"`
+}
+
+func scanFeedEntry(row interface {
+	Scan(dest ...any) error
+}) (FeedEntry, error) {
+	var e FeedEntry
+	err := row.Scan(
+		&e.ID, &e.UserID, &e.MediaType, &e.TMDBID, &e.Title, &e.PosterPath,
+		&e.Status, &e.Rating, &e.Review, &e.CreatedAt, &e.UpdatedAt, &e.LikeCount,
+		&e.LikedByMe,
+	)
+	return e, err
+}
+
 // ListFeedEntriesByUserID fetches recent activity for userID's feed --
 // their own entries plus their accepted friends', most recently
 // updated first, capped at limit and starting after offset entries. A
 // status change bubbles an entry back to the top the same way it does
 // for a single profile's Recent Activities.
-func ListFeedEntriesByUserID(ctx context.Context, db DB, userID string, limit int, offset int) ([]MediaEntry, error) {
+func ListFeedEntriesByUserID(ctx context.Context, db DB, userID string, limit int, offset int) ([]FeedEntry, error) {
 	rows, err := db.Query(ctx, `
-		SELECT `+mediaEntryColumns+`
+		SELECT `+mediaEntryColumns+`,
+			EXISTS (
+				SELECT 1 FROM media_entry_likes
+				WHERE media_entry_id = media_entries.id AND user_id = $1
+			) AS liked_by_me
 		FROM media_entries
 		WHERE user_id = $1
 		   OR user_id IN (
@@ -144,9 +169,9 @@ func ListFeedEntriesByUserID(ctx context.Context, db DB, userID string, limit in
 	}
 	defer rows.Close()
 
-	entries := []MediaEntry{}
+	entries := []FeedEntry{}
 	for rows.Next() {
-		entry, err := scanMediaEntry(rows)
+		entry, err := scanFeedEntry(rows)
 		if err != nil {
 			return nil, err
 		}

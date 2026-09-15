@@ -44,3 +44,17 @@ export async function deleteMediaEntry(id: string): Promise<void> {
     throw new Error("Failed to delete media entry");
   }
 }
+
+export async function likeMediaEntry(id: string): Promise<void> {
+  const response = await fetch(`/api/media-entries/${id}/like`, { method: "POST" });
+  if (!response.ok) {
+    throw new Error("Failed to like media entry");
+  }
+}
+
+export async function unlikeMediaEntry(id: string): Promise<void> {
+  const response = await fetch(`/api/media-entries/${id}/like`, { method: "DELETE" });
+  if (!response.ok) {
+    throw new Error("Failed to unlike media entry");
+  }
+}

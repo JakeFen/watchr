@@ -12,6 +12,7 @@ export type MediaEntry = {
   rating: number | null;
   review: string | null;
   updatedAt: string;
+  likeCount: number;
 };
 
 export type MediaEntryResponse = {
@@ -25,4 +26,13 @@ export type MediaEntryResponse = {
   rating: number | null;
   review: string | null;
   updated_at: string;
+  like_count: number;
 };
+
+// FeedEntry adds whether the feed's viewer has liked the entry --
+// only meaningful in a viewer-scoped listing like the feed, not on a
+// MediaEntry looked up on its own with no authenticated viewer to
+// check against.
+export type FeedEntry = MediaEntry & { likedByMe: boolean };
+
+export type FeedEntryResponse = MediaEntryResponse & { liked_by_me: boolean };

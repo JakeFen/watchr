@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Button } from "../../components/Button";
 import { ButtonVariant } from "../../types/button";
-import type { MediaEntry } from "../../types/mediaEntry";
+import type { FeedEntry } from "../../types/mediaEntry";
 import type { UserSummary } from "../../types/userSummary";
 import { FeedItem } from "./FeedItem";
 
@@ -17,7 +17,7 @@ export function FeedList({
   initialEntries,
   initialActors,
 }: {
-  initialEntries: MediaEntry[];
+  initialEntries: FeedEntry[];
   initialActors: UserSummary[];
 }) {
   const [entries, setEntries] = useState(initialEntries);
@@ -35,7 +35,7 @@ export function FeedList({
         setHasMore(false);
         return;
       }
-      const { entries: nextEntries, actors: nextActors }: { entries: MediaEntry[]; actors: UserSummary[] } =
+      const { entries: nextEntries, actors: nextActors }: { entries: FeedEntry[]; actors: UserSummary[] } =
         await response.json();
 
       setEntries((previous) => [...previous, ...nextEntries]);

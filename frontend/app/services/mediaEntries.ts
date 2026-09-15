@@ -1,6 +1,6 @@
 import { backendFetch, backendUrl } from "./backendFetch";
 import type { WatchStatus } from "../types/media";
-import type { MediaEntry, MediaEntryResponse } from "../types/mediaEntry";
+import type { FeedEntry, FeedEntryResponse, MediaEntry, MediaEntryResponse } from "../types/mediaEntry";
 import type { TmdbMediaType } from "../types/tmdb";
 
 function toMediaEntry(entry: MediaEntryResponse): MediaEntry {
@@ -15,14 +15,19 @@ function toMediaEntry(entry: MediaEntryResponse): MediaEntry {
     rating: entry.rating,
     review: entry.review,
     updatedAt: entry.updated_at,
+    likeCount: entry.like_count,
   };
+}
+
+function toFeedEntry(entry: FeedEntryResponse): FeedEntry {
+  return { ...toMediaEntry(entry), likedByMe: entry.liked_by_me };
 }
 
 // getFeed returns a page of the caller's recent activity feed --
 // their own entries plus their accepted friends', most recently
 // updated first. offset skips that many entries, for paging through
 // the feed past the first `limit`.
-export async function getFeed(token: string, limit?: number, offset?: number): Promise<MediaEntry[]> {
+export async function getFeed(token: string, limit?: number, offset?: number): Promise<FeedEntry[]> {
   const params = new URLSearchParams();
   if (limit) {
     params.set("limit", String(limit));
@@ -35,8 +40,8 @@ export async function getFeed(token: string, limit?: number, offset?: number): P
   if (!response.ok) {
     throw new Error(`Failed to load feed: ${response.status}`);
   }
-  const entries: MediaEntryResponse[] = await response.json();
-  return entries.map(toMediaEntry);
+  const entries: FeedEntryResponse[] = await response.json();
+  return entries.map(toFeedEntry);
 }
 
 export async function getMyMediaEntry(
@@ -119,5 +124,21 @@ export async function deleteMediaEntry(token: string, id: string): Promise<void>
   const response = await backendFetch(token, `/media-entries/${id}`, { method: "DELETE" });
   if (!response.ok && response.status !== 404) {
     throw new Error(`Failed to delete media entry: ${response.status}`);
+  }
+}
+
+export async function likeMediaEntry(token: string, id: string): Promise<void> {
+  const response = await backendFetch(token, `/media-entries/${id}/like`, { method: "POST" });
+  // 409 means the caller already liked it -- from this call's point of
+  // view that's the outcome it wanted anyway, not a failure.
+  if (!response.ok && response.status !== 409) {
+    throw new Error(`Failed to like media entry: ${response.status}`);
+  }
+}
+
+export async function unlikeMediaEntry(token: string, id: string): Promise<void> {
+  const response = await backendFetch(token, `/media-entries/${id}/like`, { method: "DELETE" });
+  if (!response.ok && response.status !== 404) {
+    throw new Error(`Failed to unlike media entry: ${response.status}`);
   }
 }
