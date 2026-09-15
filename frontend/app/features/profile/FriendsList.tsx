@@ -1,7 +1,7 @@
 import { Button } from "../../components/Button";
+import { UserListItem } from "../../components/UserListItem";
 import { listFriendsForUser } from "../../services/friendships";
 import { ButtonVariant } from "../../types/button";
-import { FriendListItem } from "./FriendListItem";
 
 const PREVIEW_COUNT = 5;
 const MAX_DISPLAYED_COUNT = 500;
@@ -24,7 +24,7 @@ export async function FriendsList({ userId }: { userId: string }) {
         <ul className="flex flex-col gap-3">
           {friends.slice(0, PREVIEW_COUNT).map((friend) => (
             <li key={friend.id}>
-              <FriendListItem friend={friend} />
+              <UserListItem user={friend} />
             </li>
           ))}
         </ul>

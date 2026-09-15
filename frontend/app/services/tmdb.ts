@@ -40,12 +40,25 @@ function toMediaItem(result: TmdbMediaResult, mediaType: TmdbMediaType): MediaIt
       ? tmdbImageUrl(TmdbImageWidth.Poster, result.poster_path)
       : undefined,
     rating: result.vote_average > 0 ? result.vote_average : undefined,
+    overview: result.overview || undefined,
   };
 }
 
 async function fetchMediaList(path: string, mediaType: TmdbMediaType): Promise<MediaItem[]> {
   const { results } = await tmdbFetch<{ results: TmdbMediaResult[] }>(path);
   return results.slice(0, 10).map((result) => toMediaItem(result, mediaType));
+}
+
+function searchMediaType(mediaType: TmdbMediaType, query: string): Promise<MediaItem[]> {
+  return fetchMediaList(`/search/${mediaType}?query=${encodeURIComponent(query)}`, mediaType);
+}
+
+export async function searchMedia(query: string): Promise<MediaItem[]> {
+  const [movies, shows] = await Promise.all([
+    searchMediaType(TmdbMediaType.Movie, query),
+    searchMediaType(TmdbMediaType.Tv, query),
+  ]);
+  return [...movies, ...shows];
 }
 
 export function getTrendingMovies(timeWindow: TmdbTimeWindow = TmdbTimeWindow.Week) {

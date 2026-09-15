@@ -1,11 +1,11 @@
-import type { Friend } from "../types/friend";
+import type { UserSummary } from "../types/userSummary";
 
 const BACKEND_URL = process.env.BACKEND_URL;
 
 // listFriendsForUser lists a user's accepted friends by their id.
 // Friendships aren't private, so this hits the backend's public
 // endpoint directly -- no Clerk token needed.
-export async function listFriendsForUser(userID: string): Promise<Friend[]> {
+export async function listFriendsForUser(userID: string): Promise<UserSummary[]> {
   const response = await fetch(`${BACKEND_URL}/users/${userID}/friends`, {
     cache: "no-store",
   });

@@ -1,5 +1,5 @@
+import { UserListItem } from "../../components/UserListItem";
 import { listFriendsForUser } from "../../services/friendships";
-import { FriendListItem } from "./FriendListItem";
 
 export async function FriendsPageContent({ userId }: { userId: string }) {
   const friends = await listFriendsForUser(userId).catch(() => []);
@@ -13,7 +13,7 @@ export async function FriendsPageContent({ userId }: { userId: string }) {
         <ul className="flex flex-col gap-4">
           {friends.map((friend) => (
             <li key={friend.id}>
-              <FriendListItem friend={friend} avatarSizeClassName="h-12 w-12" />
+              <UserListItem user={friend} avatarSizeClassName="h-12 w-12" />
             </li>
           ))}
         </ul>

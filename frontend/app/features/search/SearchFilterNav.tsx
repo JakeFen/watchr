@@ -1,26 +1,31 @@
-"use client";
-
-import { useRouter } from "next/navigation";
 import { SearchFilter } from "../../types/searchFilter";
 
-const FILTERS: { label: string; value: SearchFilter }[] = [
-  { label: "All", value: SearchFilter.All },
-  { label: "Films", value: SearchFilter.Films },
-  { label: "Users", value: SearchFilter.Users },
-];
-
-export function SearchFilterNav({ query, filter }: { query: string; filter: SearchFilter }) {
-  const router = useRouter();
+export function SearchFilterNav({
+  filter,
+  onChange,
+  allCount,
+  filmCount,
+  userCount,
+}: {
+  filter: SearchFilter;
+  onChange: (filter: SearchFilter) => void;
+  allCount: number;
+  filmCount: number;
+  userCount: number;
+}) {
+  const options = [
+    { label: `All (${allCount})`, value: SearchFilter.All },
+    { label: `Films (${filmCount})`, value: SearchFilter.Films },
+    { label: `Users (${userCount})`, value: SearchFilter.Users },
+  ];
 
   return (
     <nav className="flex gap-2 sm:w-40 sm:flex-col">
-      {FILTERS.map((option) => (
+      {options.map((option) => (
         <button
           key={option.value}
           type="button"
-          onClick={() =>
-            router.replace(`/search?${new URLSearchParams({ q: query, type: option.value })}`)
-          }
+          onClick={() => onChange(option.value)}
           className={`cursor-pointer rounded px-4 py-2 text-left text-sm font-medium transition-colors ${
             option.value === filter
               ? "bg-zinc-800 text-zinc-100"

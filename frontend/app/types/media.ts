@@ -18,6 +18,7 @@ export type MediaItem = {
   title: string;
   imageUrl?: string;
   rating?: number;
+  overview?: string;
 };
 
 export type MediaCastMember = {
