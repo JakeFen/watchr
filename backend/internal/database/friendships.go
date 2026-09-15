@@ -1,11 +1,21 @@
 package database
 
-import "context"
+import (
+	"context"
+	"errors"
+
+	"github.com/jackc/pgx/v5/pgconn"
+)
 
 type Friend struct {
 	ID       string  `json:"id"`
 	Username *string `json:"username"`
 }
+
+// ErrFriendshipExists is returned by CreateFriendRequest when a
+// friendship row -- in either direction, any status -- already exists
+// between the two users.
+var ErrFriendshipExists = errors.New("friendship already exists")
 
 // ListFriendsByUserID fetches userID's accepted friends -- the other
 // user in each friendship row where userID is either side, since a
@@ -34,4 +44,52 @@ func ListFriendsByUserID(ctx context.Context, db DB, userID string) ([]Friend, e
 		friends = append(friends, f)
 	}
 	return friends, rows.Err()
+}
+
+// CreateFriendRequest creates a pending friendship from requesterID to
+// addresseeID. Returns ErrFriendshipExists if a friendship already
+// exists between the two in either direction -- the table's UNIQUE
+// (requester_id, addressee_id) constraint only catches the exact same
+// direction, so this checks both explicitly first.
+func CreateFriendRequest(ctx context.Context, db DB, requesterID string, addresseeID string) error {
+	var exists bool
+	if err := db.QueryRow(ctx, `
+		SELECT EXISTS (
+			SELECT 1 FROM friendships
+			WHERE (requester_id = $1 AND addressee_id = $2) OR (requester_id = $2 AND addressee_id = $1)
+		)`,
+		requesterID, addresseeID,
+	).Scan(&exists); err != nil {
+		return err
+	}
+	if exists {
+		return ErrFriendshipExists
+	}
+
+	_, err := db.Exec(ctx,
+		`INSERT INTO friendships (requester_id, addressee_id, status) VALUES ($1, $2, 'pending')`,
+		requesterID, addresseeID,
+	)
+	var pgErr *pgconn.PgError
+	if errors.As(err, &pgErr) && pgErr.Code == "23505" {
+		return ErrFriendshipExists
+	}
+	return err
+}
+
+// DeleteFriendship removes any friendship row between the two users,
+// regardless of status or direction -- unfriending an accepted
+// friendship, canceling a request you sent, and declining one you
+// received are all the same operation: remove the relationship.
+// Returns false if no such row existed.
+func DeleteFriendship(ctx context.Context, db DB, userID string, otherUserID string) (bool, error) {
+	tag, err := db.Exec(ctx, `
+		DELETE FROM friendships
+		WHERE (requester_id = $1 AND addressee_id = $2) OR (requester_id = $2 AND addressee_id = $1)`,
+		userID, otherUserID,
+	)
+	if err != nil {
+		return false, err
+	}
+	return tag.RowsAffected() > 0, nil
 }
