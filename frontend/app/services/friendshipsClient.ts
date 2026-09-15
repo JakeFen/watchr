@@ -7,6 +7,13 @@ export async function sendFriendRequest(userId: string): Promise<void> {
   }
 }
 
+export async function acceptFriendRequest(userId: string): Promise<void> {
+  const response = await fetch(`/api/friendships/${userId}`, { method: "PATCH" });
+  if (!response.ok) {
+    throw new Error("Failed to accept friend request");
+  }
+}
+
 export async function removeFriendship(userId: string): Promise<void> {
   const response = await fetch(`/api/friendships/${userId}`, { method: "DELETE" });
   if (!response.ok) {

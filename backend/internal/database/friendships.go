@@ -41,6 +41,46 @@ func ListFriendsByUserID(ctx context.Context, db DB, userID string) ([]string, e
 	return ids, rows.Err()
 }
 
+// ListPendingRequestsByUserID fetches the ids of requesters who've
+// sent userID a pending friend request, most recent first.
+func ListPendingRequestsByUserID(ctx context.Context, db DB, userID string) ([]string, error) {
+	rows, err := db.Query(ctx, `
+		SELECT requester_id FROM friendships
+		WHERE status = 'pending' AND addressee_id = $1
+		ORDER BY created_at DESC`,
+		userID,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	ids := []string{}
+	for rows.Next() {
+		var id string
+		if err := rows.Scan(&id); err != nil {
+			return nil, err
+		}
+		ids = append(ids, id)
+	}
+	return ids, rows.Err()
+}
+
+// AcceptFriendRequest marks the pending friendship requesterID sent
+// to addresseeID as accepted. Returns false if no such pending
+// request existed.
+func AcceptFriendRequest(ctx context.Context, db DB, requesterID string, addresseeID string) (bool, error) {
+	tag, err := db.Exec(ctx, `
+		UPDATE friendships SET status = 'accepted', updated_at = NOW()
+		WHERE requester_id = $1 AND addressee_id = $2 AND status = 'pending'`,
+		requesterID, addresseeID,
+	)
+	if err != nil {
+		return false, err
+	}
+	return tag.RowsAffected() > 0, nil
+}
+
 // GetFriendshipStatus returns the status ("pending" or "accepted") of
 // any friendship row between the two users, in either direction, or
 // "" if none exists.

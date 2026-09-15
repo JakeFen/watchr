@@ -11,26 +11,33 @@ const BUTTON_LABEL: Record<FriendshipStatus, string> = {
   [FriendshipStatus.Accepted]: "Remove Friend",
 };
 
+const BUTTON_VARIANT: Record<FriendshipStatus, ButtonVariant> = {
+  [FriendshipStatus.None]: ButtonVariant.Primary,
+  [FriendshipStatus.Pending]: ButtonVariant.Secondary,
+  [FriendshipStatus.Accepted]: ButtonVariant.Danger,
+};
+
 export function FriendActionButton({
   userId,
   initialStatus,
+  className,
 }: {
   userId: string;
   initialStatus: FriendshipStatus;
+  className?: string;
 }) {
   const { status, isSaving, error, add, remove } = useFriendship({
     userId,
     initialStatus,
   });
 
-  const isNone = status === FriendshipStatus.None;
-
   return (
-    <div>
+    <div className="shrink-0">
       <Button
-        variant={isNone ? ButtonVariant.Primary : ButtonVariant.Secondary}
+        variant={BUTTON_VARIANT[status]}
         disabled={isSaving}
-        onClick={isNone ? add : remove}
+        onClick={status === FriendshipStatus.None ? add : remove}
+        className={className}
       >
         {BUTTON_LABEL[status]}
       </Button>

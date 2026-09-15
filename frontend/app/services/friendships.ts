@@ -15,6 +15,25 @@ export async function listFriendsForUser(userID: string): Promise<string[]> {
   return response.json();
 }
 
+// listPendingFriendRequests lists the ids of requesters who've sent
+// userID a pending request. The caller must be authenticated as
+// userID themselves -- unlike the accepted friends list, this isn't
+// visible to anyone else.
+export async function listPendingFriendRequests(token: string, userID: string): Promise<string[]> {
+  const response = await backendFetch(token, `/users/${userID}/friend-requests`);
+  if (!response.ok) {
+    throw new Error(`Failed to list pending requests: ${response.status}`);
+  }
+  return response.json();
+}
+
+export async function acceptFriendRequest(token: string, userID: string): Promise<void> {
+  const response = await backendFetch(token, `/users/${userID}/friends`, { method: "PATCH" });
+  if (!response.ok) {
+    throw new Error(`Failed to accept friend request: ${response.status}`);
+  }
+}
+
 // getFriendshipStatus returns the status of any friendship (either
 // direction) between the caller and userID -- FriendshipStatus.None
 // if there isn't one.

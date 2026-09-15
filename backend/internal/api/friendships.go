@@ -22,6 +22,57 @@ func (h *Handler) ListUserFriends(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, friends)
 }
 
+// ListPendingFriendRequests handles GET /users/{userID}/friend-requests.
+// The caller must be authenticated and must be userID themselves --
+// unlike the accepted friends list, pending requests aren't visible
+// to anyone else, since they reveal who's asked to friend you.
+func (h *Handler) ListPendingFriendRequests(w http.ResponseWriter, r *http.Request) {
+	clerkUserID, ok := auth.ClerkUserID(r.Context())
+	if !ok {
+		writeError(w, http.StatusUnauthorized, "missing or invalid session")
+		return
+	}
+
+	userID := r.PathValue("userID")
+	if userID != clerkUserID {
+		writeError(w, http.StatusForbidden, "cannot view another user's pending requests")
+		return
+	}
+
+	requests, err := database.ListPendingRequestsByUserID(r.Context(), h.DB, userID)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "failed to list pending requests")
+		return
+	}
+
+	writeJSON(w, http.StatusOK, requests)
+}
+
+// AcceptFriendRequest handles PATCH /users/{userID}/friends. The
+// caller must be authenticated; userID is who sent them a pending
+// request. Only the addressee (the caller) can accept it.
+func (h *Handler) AcceptFriendRequest(w http.ResponseWriter, r *http.Request) {
+	clerkUserID, ok := auth.ClerkUserID(r.Context())
+	if !ok {
+		writeError(w, http.StatusUnauthorized, "missing or invalid session")
+		return
+	}
+
+	requesterID := r.PathValue("userID")
+
+	accepted, err := database.AcceptFriendRequest(r.Context(), h.DB, requesterID, clerkUserID)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, "failed to accept friend request")
+		return
+	}
+	if !accepted {
+		writeError(w, http.StatusNotFound, "no pending request found")
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
 // GetFriendshipStatus handles GET /users/{userID}/friendship-status.
 // The caller must be authenticated. Returns the status of any
 // friendship between the caller and userID -- "pending", "accepted",
